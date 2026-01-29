@@ -26,7 +26,15 @@ extend({MeshLineGeometry, MeshLineMaterial});
 function useCardTexture(baseTexture: THREE.Texture | null, userName?: string): THREE.Texture | null {
     const [canvasTexture, setCanvasTexture] = useState<THREE.CanvasTexture | null>(null);
 
+    console.log("[v0] useCardTexture called with:", { 
+        hasBaseTexture: !!baseTexture, 
+        hasImage: !!baseTexture?.image,
+        imageType: baseTexture?.image?.constructor?.name,
+        userName 
+    });
+
     useEffect(() => {
+        console.log("[v0] useCardTexture useEffect running, baseTexture?.image:", baseTexture?.image);
         if (!baseTexture?.image) return;
 
         const canvas = document.createElement('canvas');
@@ -181,7 +189,14 @@ function Band({maxSpeed = 50, minSpeed = 0, isMobile = false, userName}: BandPro
     const {nodes, materials} = useGLTF(cardGLB) as any;
     const texture = useTexture(typeof lanyard === 'string' ? lanyard : lanyard.src) as THREE.Texture;
     const baseCardTexture = materials.base?.map as THREE.Texture | null;
+    
+    console.log("[v0] Band - materials.base:", materials.base);
+    console.log("[v0] Band - materials.base.map:", materials.base?.map);
+    console.log("[v0] Band - baseCardTexture:", baseCardTexture);
+    
     const customCardTexture = useCardTexture(baseCardTexture, userName);
+    
+    console.log("[v0] Band - customCardTexture:", customCardTexture);
     const [curve] = useState(
         () =>
             new THREE.CatmullRomCurve3([new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()])
