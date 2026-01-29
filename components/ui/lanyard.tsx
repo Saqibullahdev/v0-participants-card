@@ -14,6 +14,7 @@ import {
 } from '@react-three/rapier';
 import {MeshLineGeometry, MeshLineMaterial} from 'meshline';
 import * as THREE from 'three';
+import clsx from 'clsx';
 
 // replace with your own imports, see the usage snippet for details
 import lanyard from './lanyard.png';
@@ -27,13 +28,15 @@ interface LanyardProps {
     gravity?: [number, number, number];
     fov?: number;
     transparent?: boolean;
+    containerClassName?: string;
 }
 
 export default function Lanyard({
                                     position = [0, 0, 30],
                                     gravity = [0, -40, 0],
                                     fov = 20,
-                                    transparent = true
+                                    transparent = true,
+                                    containerClassName
                                 }: LanyardProps) {
     const [isMobile, setIsMobile] = useState<boolean>(() => typeof window !== 'undefined' && window.innerWidth < 768);
 
@@ -45,7 +48,7 @@ export default function Lanyard({
 
     return (
         <div
-            className="relative z-0 w-full h-screen flex justify-center items-center transform scale-100 origin-center">
+            className={clsx(containerClassName || "relative z-0 w-full h-screen flex justify-center items-center transform scale-100 origin-center")}>
             <Canvas
                 camera={{position, fov}}
                 dpr={[1, isMobile ? 1.5 : 2]}

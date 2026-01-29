@@ -10,7 +10,6 @@ import VercelWordmarkIcon from "@/components/icons/vercel-wordmark-icon";
 import GlobantLogoIcon from "@/components/icons/globant-logo-icon";
 import DecryptedText from "@/components/DecryptedText";
 import {transitionVariants} from "@/lib/utils";
-import Image from "next/image";
 import Lanyard from "@/components/ui/lanyard";
 
 export default function HeroSection() {
@@ -90,7 +89,7 @@ export default function HeroSection() {
                             </AnimatedGroup>
                         </div>
                     </div>
-                    <Lanyard/>
+                    <Lanyard position={[0, 0, 20]} containerClassName='absolute top-0 right-0 w-1/2 h-screen'/>
                 </div>
             </section>
             <section className="bg-background pb-16 md:pb-32">
