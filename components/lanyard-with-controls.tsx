@@ -61,20 +61,27 @@ export default function LanyardWithControls({
   const [cardTextureUrl, setCardTextureUrl] = useState<string | undefined>(undefined);
   const [textureKey, setTextureKey] = useState(0);
   const [copied, setCopied] = useState(false);
-  const [isReady, setIsReady] = useState(!defaultName); // Ready immediately if no defaultName
+  const [isInitialized, setIsInitialized] = useState(false);
   const cardTemplateRef = useRef<CardTemplateRef>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   
   // Auto-capture texture when component mounts with a defaultName from URL
   useEffect(() => {
-    if (defaultName && cardTemplateRef.current) {
-      // Small delay to ensure the card template is fully rendered
-      const timer = setTimeout(async () => {
-        await cardTemplateRef.current?.captureTexture();
-        setIsReady(true);
-      }, 100);
-      return () => clearTimeout(timer);
+    // If no defaultName, mark as initialized immediately
+    if (!defaultName) {
+      setIsInitialized(true);
+      return;
     }
+    
+    // If there's a defaultName, wait for card template to render then capture
+    const timer = setTimeout(async () => {
+      if (cardTemplateRef.current) {
+        await cardTemplateRef.current.captureTexture();
+      }
+      setIsInitialized(true);
+    }, 150);
+    
+    return () => clearTimeout(timer);
   }, [defaultName]);
 
   // Generate shareable URL with encrypted username
@@ -151,8 +158,8 @@ export default function LanyardWithControls({
     }
   };
 
-  // Show loading spinner while waiting for texture to be ready
-  if (!isReady) {
+  // Show loading spinner while waiting for initialization
+  if (!isInitialized) {
     return (
       <div className="flex flex-col">
         <CardTemplate
