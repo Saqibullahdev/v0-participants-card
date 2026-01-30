@@ -31,15 +31,7 @@ export default function LanyardWithControls({
   const [textureKey, setTextureKey] = useState(0);
   const cardTemplateRef = useRef<CardTemplateRef>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [exportBgImage, setExportBgImage] = useState<HTMLImageElement | null>(null);
 
-  // Preload background image for export
-  useEffect(() => {
-    const img = new Image();
-    img.crossOrigin = "anonymous";
-    img.onload = () => setExportBgImage(img);
-    img.src = "/export-bg.webp";
-  }, []);
 
   const characterCount = inputValue.length;
   const isAtLimit = characterCount >= MAX_CHARACTERS;
@@ -52,69 +44,7 @@ export default function LanyardWithControls({
   }, []);
 
   const handleExport = () => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    // Crop settings - adjust these to change the export area
-    const cropScale = 0.6; // Crop to 60% of the canvas (centered) - closer view
-    const cropWidth = canvas.width * cropScale;
-    const cropHeight = canvas.height * cropScale;
-    const cropX = (canvas.width - cropWidth) / 2;
-    const cropY = (canvas.height - cropHeight) / 2;
-
-    // Output resolution multiplier for higher quality export
-    const outputScale = 2; // 2x resolution for sharper image
-    const outputWidth = cropWidth * outputScale;
-    const outputHeight = cropHeight * outputScale;
-
-    // Create a new canvas for the final image
-    const exportCanvas = document.createElement("canvas");
-    exportCanvas.width = outputWidth;
-    exportCanvas.height = outputHeight;
-    const ctx = exportCanvas.getContext("2d");
-    
-    if (!ctx) return;
-
-    // Enable high-quality image scaling
-    ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = "high";
-
-    // Draw background image first (cover the entire canvas)
-    if (exportBgImage) {
-      const bgAspect = exportBgImage.width / exportBgImage.height;
-      const canvasAspect = outputWidth / outputHeight;
-      
-      let drawWidth, drawHeight, drawX, drawY;
-      
-      if (bgAspect > canvasAspect) {
-        // Background is wider - fit height, crop width
-        drawHeight = outputHeight;
-        drawWidth = outputHeight * bgAspect;
-        drawX = (outputWidth - drawWidth) / 2;
-        drawY = 0;
-      } else {
-        // Background is taller - fit width, crop height
-        drawWidth = outputWidth;
-        drawHeight = outputWidth / bgAspect;
-        drawX = 0;
-        drawY = (outputHeight - drawHeight) / 2;
-      }
-      
-      ctx.drawImage(exportBgImage, drawX, drawY, drawWidth, drawHeight);
-    }
-
-    // Draw the cropped lanyard on top (scaled up)
-    ctx.drawImage(
-      canvas,
-      cropX, cropY, cropWidth, cropHeight, // Source rectangle
-      0, 0, outputWidth, outputHeight // Destination rectangle (scaled up)
-    );
-
-    const dataUrl = exportCanvas.toDataURL("image/png");
-    const link = document.createElement("a");
-    link.download = `lanyard-${appliedName || "card"}.png`;
-    link.href = dataUrl;
-    link.click();
+    cardTemplateRef.current?.exportCard();
   };
 
   const handleApplyName = async () => {

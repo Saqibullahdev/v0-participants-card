@@ -9,6 +9,7 @@ interface CardTemplateProps {
 
 export interface CardTemplateRef {
   captureTexture: () => Promise<void>;
+  exportCard: () => void;
 }
 
 const CANVAS_SIZE = 1376;
@@ -57,8 +58,45 @@ const CardTemplate = forwardRef<CardTemplateRef, CardTemplateProps>(
       onTextureReady(dataUrl);
     };
 
+    const exportCard = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = CANVAS_SIZE;
+      canvas.height = CANVAS_SIZE;
+      const ctx = canvas.getContext("2d");
+      
+      if (!ctx) return;
+
+      // Draw base card image (fills entire canvas)
+      if (baseImage) {
+        ctx.drawImage(baseImage, 0, 0, CANVAS_SIZE, CANVAS_SIZE);
+      } else {
+        // Fallback black background if image not loaded
+        ctx.fillStyle = "#000000";
+        ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+      }
+
+      // Draw user name at the bottom left area (below the geometric pattern)
+      const displayName = userName || "YOUR NAME";
+      ctx.fillStyle = "#ffffff";
+      ctx.font = 'normal 48px "Geist Mono", monospace';
+      ctx.textAlign = "right";
+      ctx.textBaseline = "middle";
+      
+      const textX = (CANVAS_SIZE / 2) - 55;
+      const textY = CANVAS_SIZE - 400;
+      ctx.fillText(displayName.toUpperCase(), textX, textY);
+
+      // Export at full resolution
+      const dataUrl = canvas.toDataURL("image/png", 1.0);
+      const link = document.createElement("a");
+      link.download = `v0-guadalajara-${userName || "card"}.png`;
+      link.href = dataUrl;
+      link.click();
+    };
+
     useImperativeHandle(ref, () => ({
       captureTexture,
+      exportCard,
     }));
 
     // This component doesn't render anything visible
