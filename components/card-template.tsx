@@ -11,7 +11,7 @@ export interface CardTemplateRef {
   captureTexture: () => Promise<void>;
 }
 
-const CANVAS_SIZE = 512;
+const CANVAS_SIZE = 1376;
 
 const CardTemplate = forwardRef<CardTemplateRef, CardTemplateProps>(
   ({ userName, onTextureReady }, ref) => {
@@ -45,12 +45,12 @@ const CardTemplate = forwardRef<CardTemplateRef, CardTemplateProps>(
       // Draw user name at the bottom left area (below the geometric pattern)
       const displayName = userName || "YOUR NAME";
       ctx.fillStyle = "#ffffff";
-      ctx.font = 'bold 24px "Geist Mono", monospace';
-      ctx.textAlign = "left";
+      ctx.font = 'normal 48px "Geist Mono", monospace';
+      ctx.textAlign = "right";
       ctx.textBaseline = "middle";
       
-      const textX = 40;
-      const textY = CANVAS_SIZE - 60;
+      const textX = (CANVAS_SIZE / 2) - 50;
+      const textY = CANVAS_SIZE - 440;
       ctx.fillText(displayName.toUpperCase(), textX, textY);
 
       const dataUrl = canvas.toDataURL("image/png");
