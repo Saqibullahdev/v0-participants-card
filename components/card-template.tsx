@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useRef, forwardRef, useImperativeHandle } from "react";
-import html2canvas from "html2canvas";
+import { forwardRef, useImperativeHandle, useEffect, useState } from "react";
 
 interface CardTemplateProps {
   userName: string;
@@ -12,19 +11,50 @@ export interface CardTemplateRef {
   captureTexture: () => Promise<void>;
 }
 
+const CANVAS_SIZE = 512;
+
 const CardTemplate = forwardRef<CardTemplateRef, CardTemplateProps>(
   ({ userName, onTextureReady }, ref) => {
-    const templateRef = useRef<HTMLDivElement>(null);
+    const [iconImage, setIconImage] = useState<HTMLImageElement | null>(null);
+
+    // Preload the icon image
+    useEffect(() => {
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.onload = () => setIconImage(img);
+      img.src = "/icon.svg";
+    }, []);
 
     const captureTexture = async () => {
-      if (!templateRef.current) return;
+      const canvas = document.createElement("canvas");
+      canvas.width = CANVAS_SIZE;
+      canvas.height = CANVAS_SIZE;
+      const ctx = canvas.getContext("2d");
+      
+      if (!ctx) return;
 
-      const canvas = await html2canvas(templateRef.current, {
-        backgroundColor: null,
-        scale: 2,
-        useCORS: true,
-        allowTaint: true,
-      });
+      // Background - black
+      ctx.fillStyle = "#000000";
+      ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+
+      // Draw icon in center
+      if (iconImage) {
+        const iconSize = 128;
+        const iconX = (CANVAS_SIZE - iconSize) / 2;
+        const iconY = (CANVAS_SIZE - iconSize) / 2 - 40; // Slightly above center
+        ctx.drawImage(iconImage, iconX, iconY, iconSize, iconSize);
+      }
+
+      // Draw user name at bottom
+      const displayName = userName || "YOUR NAME";
+      ctx.fillStyle = "#ffffff";
+      ctx.font = 'bold 28px "Geist Mono", monospace';
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.letterSpacing = "4px";
+      
+      const textY = CANVAS_SIZE - 80;
+      ctx.fillText(displayName.toUpperCase(), CANVAS_SIZE / 2, textY);
 
       const dataUrl = canvas.toDataURL("image/png");
       onTextureReady(dataUrl);
@@ -34,71 +64,8 @@ const CardTemplate = forwardRef<CardTemplateRef, CardTemplateProps>(
       captureTexture,
     }));
 
-    return (
-      <div
-        ref={templateRef}
-        style={{
-          position: "absolute",
-          left: "-9999px",
-          top: "-9999px",
-          pointerEvents: "none",
-          width: "512px",
-          height: "512px",
-        }}
-      >
-        {/* Card design - black square with centered icon and name at bottom */}
-        <div
-          style={{
-            width: "100%",
-            height: "100%",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "space-between",
-            padding: "32px",
-            backgroundColor: "#000000",
-            fontFamily: '"Geist Mono", monospace',
-          }}
-        >
-          {/* Top spacer */}
-          <div />
-
-          {/* Center - V0 Icon */}
-          <div
-            style={{
-              flex: 1,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/icon.svg"
-              alt="V0 Icon"
-              style={{ width: "128px", height: "128px" }}
-              crossOrigin="anonymous"
-            />
-          </div>
-
-          {/* Bottom - User Name */}
-          <div style={{ width: "100%", textAlign: "center" }}>
-            <span
-              style={{
-                color: "#ffffff",
-                fontSize: "24px",
-                fontWeight: "bold",
-                letterSpacing: "0.1em",
-                textTransform: "uppercase",
-                fontFamily: '"Geist Mono", monospace',
-              }}
-            >
-              {userName || "YOUR NAME"}
-            </span>
-          </div>
-        </div>
-      </div>
-    );
+    // This component doesn't render anything visible
+    return null;
   }
 );
 
