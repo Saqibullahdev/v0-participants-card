@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/tooltip";
 import CardTemplate, { type CardTemplateRef, type CardVariant } from "@/components/card-template";
 import { Download, Link, Check } from "lucide-react";
-import { encryptUsername } from "@/lib/utils";
+import { encryptLanyardData } from "@/lib/utils";
 
 // X (Twitter) icon component
 function XIcon({ className }: { className?: string }) {
@@ -47,17 +47,19 @@ interface LanyardWithControlsProps {
   position?: [number, number, number];
   containerClassName?: string;
   defaultName?: string;
+  defaultVariant?: CardVariant;
 }
 
 export default function LanyardWithControls({
   position = [0, 0, 20],
   containerClassName,
   defaultName = "",
+  defaultVariant = "dark",
 }: LanyardWithControlsProps) {
   const [inputValue, setInputValue] = useState(defaultName);
   const [appliedName, setAppliedName] = useState(defaultName);
-  const [cardVariant, setCardVariant] = useState<CardVariant>("dark");
-  const [appliedVariant, setAppliedVariant] = useState<CardVariant>("dark");
+  const [cardVariant, setCardVariant] = useState<CardVariant>(defaultVariant);
+  const [appliedVariant, setAppliedVariant] = useState<CardVariant>(defaultVariant);
   const [cardTextureUrl, setCardTextureUrl] = useState<string | undefined>(undefined);
   const [textureKey, setTextureKey] = useState(0);
   const [copied, setCopied] = useState(false);
@@ -84,15 +86,15 @@ export default function LanyardWithControls({
     return () => clearTimeout(timer);
   }, [defaultName]);
 
-  // Generate shareable URL with encrypted username
+  // Generate shareable URL with encrypted username and variant
   const getShareableUrl = useCallback(() => {
     const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
     if (appliedName) {
-      const encrypted = encryptUsername(appliedName);
+      const encrypted = encryptLanyardData(appliedName, appliedVariant);
       return `${baseUrl}/lanyard?u=${encrypted}`;
     }
     return `${baseUrl}/lanyard`;
-  }, [appliedName]);
+  }, [appliedName, appliedVariant]);
 
   // Share message templates
   const shareMessage = appliedName

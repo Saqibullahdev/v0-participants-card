@@ -3,31 +3,30 @@
 import { Suspense, useEffect, useMemo } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import LanyardWithControls from "@/components/lanyard-with-controls";
-import { decryptUsername } from "@/lib/utils";
+import { decryptLanyardData, type LanyardData } from "@/lib/utils";
 
 function LanyardContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   
-  // Decrypt username from URL params if present
-  const defaultName = useMemo(() => {
-    const encryptedName = searchParams.get("u");
-    if (encryptedName) {
-      const decrypted = decryptUsername(encryptedName);
-      return decrypted ?? null;
+  // Decrypt lanyard data (username + variant) from URL params if present
+  const lanyardData = useMemo((): LanyardData | null => {
+    const encrypted = searchParams.get("u");
+    if (encrypted) {
+      return decryptLanyardData(encrypted);
     }
     return null;
   }, [searchParams]);
 
-  // Redirect to home if no valid encrypted name is provided
+  // Redirect to home if no valid encrypted data is provided
   useEffect(() => {
-    if (defaultName === null) {
+    if (lanyardData === null) {
       router.replace("/");
     }
-  }, [defaultName, router]);
+  }, [lanyardData, router]);
 
   // Show loading while checking/redirecting
-  if (defaultName === null) {
+  if (lanyardData === null) {
     return (
       <main className="relative flex min-h-dvh flex-col items-center justify-center">
         <div className="flex h-screen items-center justify-center">
@@ -43,7 +42,8 @@ function LanyardContent() {
         <LanyardWithControls
           position={[0, 0, 18]}
           containerClassName="relative aspect-square w-full h-screen"
-          defaultName={defaultName}
+          defaultName={lanyardData.username}
+          defaultVariant={lanyardData.variant}
         />
       </div>
     </main>

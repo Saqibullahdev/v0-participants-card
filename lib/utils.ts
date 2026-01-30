@@ -22,15 +22,22 @@ function base64ToUtf8(base64: string): string {
   return new TextDecoder().decode(bytes);
 }
 
-export function encryptUsername(username: string): string {
+export type CardVariant = "dark" | "light";
+
+export interface LanyardData {
+  username: string;
+  variant: CardVariant;
+}
+
+export function encryptLanyardData(username: string, variant: CardVariant): string {
   if (!username) return "";
-  // Add key prefix, encode to base64 (UTF-8 safe), then make URL-safe
-  const combined = `${OBFUSCATION_KEY}:${username}`;
+  // Format: key:variant:username
+  const combined = `${OBFUSCATION_KEY}:${variant}:${username}`;
   const encoded = utf8ToBase64(combined);
   return encoded.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 }
 
-export function decryptUsername(encrypted: string): string | null {
+export function decryptLanyardData(encrypted: string): LanyardData | null {
   if (!encrypted) return null;
   try {
     // Restore base64 padding and characters
@@ -39,9 +46,19 @@ export function decryptUsername(encrypted: string): string | null {
     base64 += "=".repeat(padding);
     
     const decoded = base64ToUtf8(base64);
-    // Verify and extract username
+    // Verify and extract data - format: key:variant:username
     if (decoded.startsWith(`${OBFUSCATION_KEY}:`)) {
-      return decoded.slice(OBFUSCATION_KEY.length + 1);
+      const withoutKey = decoded.slice(OBFUSCATION_KEY.length + 1);
+      const colonIndex = withoutKey.indexOf(":");
+      if (colonIndex === -1) return null;
+      
+      const variant = withoutKey.slice(0, colonIndex) as CardVariant;
+      const username = withoutKey.slice(colonIndex + 1);
+      
+      // Validate variant
+      if (variant !== "dark" && variant !== "light") return null;
+      
+      return { username, variant };
     }
     return null;
   } catch {
