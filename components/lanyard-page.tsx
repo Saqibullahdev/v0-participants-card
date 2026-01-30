@@ -8,7 +8,7 @@ export default function LanyardPage() {
       <div className="relative w-full max-w-2xl">
         <LanyardWithControls
           position={[0, 0, 18]}
-          containerClassName="relative aspect-square w-full"
+          containerClassName="relative aspect-square w-full h-screen"
         />
       </div>
     </main>
