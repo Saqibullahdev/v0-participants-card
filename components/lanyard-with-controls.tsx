@@ -61,7 +61,6 @@ export default function LanyardWithControls({
         userName={inputValue}
         onTextureReady={handleTextureReady}
       />
-      
       <Lanyard
         key={textureKey}
         position={position}
