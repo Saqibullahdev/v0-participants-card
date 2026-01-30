@@ -1,8 +1,14 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import Lanyard from "@/components/ui/lanyard";
 import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import CardTemplate, { type CardTemplateRef } from "@/components/card-template";
 import { Download } from "lucide-react";
 
@@ -25,6 +31,15 @@ export default function LanyardWithControls({
   const [textureKey, setTextureKey] = useState(0);
   const cardTemplateRef = useRef<CardTemplateRef>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [exportBgImage, setExportBgImage] = useState<HTMLImageElement | null>(null);
+
+  // Preload background image for export
+  useEffect(() => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => setExportBgImage(img);
+    img.src = "/export-bg.webp";
+  }, []);
 
   const characterCount = inputValue.length;
   const isAtLimit = characterCount >= MAX_CHARACTERS;
@@ -47,22 +62,46 @@ export default function LanyardWithControls({
     const cropX = (canvas.width - cropWidth) / 2;
     const cropY = (canvas.height - cropHeight) / 2;
 
-    // Create a new canvas for the cropped image
-    const croppedCanvas = document.createElement("canvas");
-    croppedCanvas.width = cropWidth;
-    croppedCanvas.height = cropHeight;
-    const ctx = croppedCanvas.getContext("2d");
+    // Create a new canvas for the final image
+    const exportCanvas = document.createElement("canvas");
+    exportCanvas.width = cropWidth;
+    exportCanvas.height = cropHeight;
+    const ctx = exportCanvas.getContext("2d");
     
     if (!ctx) return;
 
-    // Draw the cropped portion
+    // Draw background image first (cover the entire canvas)
+    if (exportBgImage) {
+      const bgAspect = exportBgImage.width / exportBgImage.height;
+      const canvasAspect = cropWidth / cropHeight;
+      
+      let drawWidth, drawHeight, drawX, drawY;
+      
+      if (bgAspect > canvasAspect) {
+        // Background is wider - fit height, crop width
+        drawHeight = cropHeight;
+        drawWidth = cropHeight * bgAspect;
+        drawX = (cropWidth - drawWidth) / 2;
+        drawY = 0;
+      } else {
+        // Background is taller - fit width, crop height
+        drawWidth = cropWidth;
+        drawHeight = cropWidth / bgAspect;
+        drawX = 0;
+        drawY = (cropHeight - drawHeight) / 2;
+      }
+      
+      ctx.drawImage(exportBgImage, drawX, drawY, drawWidth, drawHeight);
+    }
+
+    // Draw the cropped lanyard on top
     ctx.drawImage(
       canvas,
       cropX, cropY, cropWidth, cropHeight, // Source rectangle
       0, 0, cropWidth, cropHeight // Destination rectangle
     );
 
-    const dataUrl = croppedCanvas.toDataURL("image/png");
+    const dataUrl = exportCanvas.toDataURL("image/png");
     const link = document.createElement("a");
     link.download = `lanyard-${appliedName || "card"}.png`;
     link.href = dataUrl;
@@ -143,15 +182,23 @@ export default function LanyardWithControls({
             >
               Apply
             </Button>
-            <Button
-              onClick={handleExport}
-              variant="outline"
-              size="icon"
-              className="shrink-0"
-              title="Export as PNG"
-            >
-              <Download className="h-4 w-4" />
-            </Button>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    onClick={handleExport}
+                    variant="outline"
+                    size="icon"
+                    className="shrink-0"
+                  >
+                    <Download className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Export as PNG</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
           {isAtLimit && (
             <p className="mt-1.5 text-xs text-destructive">
