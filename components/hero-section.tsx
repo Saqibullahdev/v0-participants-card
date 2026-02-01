@@ -73,7 +73,7 @@ export default function HeroSection() {
                                     asChild
                                     size="lg"
                                     className="px-5 text-base">
-                                    <Link href="#link">
+                                    <Link href="https://luma.com/ktms5ody" target="_blank" rel="noopener noreferrer">
                                         <span className="text-nowrap">Register Now</span>
                                     </Link>
                                 </Button>
@@ -83,7 +83,7 @@ export default function HeroSection() {
                                     size="lg"
                                     variant="ghost"
                                     className="px-5 text-base bg-black/30 backdrop-blur-sm hover:bg-black/40">
-                                    <Link href="#link">
+                                    <Link href="https://wa.me/923341958928" target="_blank" rel="noopener noreferrer">
                                         <span className="text-nowrap">Contact Host</span>
                                     </Link>
                                 </Button>
