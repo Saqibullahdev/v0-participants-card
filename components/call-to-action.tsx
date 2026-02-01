@@ -44,7 +44,7 @@ export default function CallToAction() {
                         <Button
                             asChild
                             size="lg">
-                            <Link href="#">
+                            <Link href="https://luma.com/ktms5ody" target="_blank" rel="noopener noreferrer">
                                 <span>Register</span>
                             </Link>
                         </Button>
@@ -53,7 +53,7 @@ export default function CallToAction() {
                             asChild
                             size="lg"
                             variant="outline">
-                            <Link href="#">
+                            <Link href="https://wa.me/923341958928" target="_blank" rel="noopener noreferrer">
                                 <span>Contact the Host</span>
                             </Link>
                         </Button>
