@@ -180,8 +180,9 @@ const CardTemplate = forwardRef<CardTemplateRef, CardTemplateProps>(
 
       // Export at full resolution
       const dataUrl = exportCanvas.toDataURL("image/png", 1.0);
+      const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
       const link = document.createElement("a");
-      link.download = `v0-guadalajara-${userName || "card"}.png`;
+      link.download = `v0-peshawar-${timestamp}.png`;
       link.href = dataUrl;
       link.click();
     };

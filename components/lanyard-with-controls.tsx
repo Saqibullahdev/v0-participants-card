@@ -98,8 +98,8 @@ export default function LanyardWithControls({
 
   // Share message templates
   const shareMessage = appliedName
-    ? `I'll be at @v0 Prompt to Production Guadalajara! Check out my personalized lanyard`
-    : `Check out v0 IRL Guadalajara! Create your personalized event lanyard`;
+    ? `I'll be at @v0 Prompt to Production Peshawar! Check out my personalized lanyard`
+    : `Check out v0 IRL Peshawar! Create your personalized event lanyard`;
 
   const handleShareX = useCallback(() => {
     const url = getShareableUrl();
