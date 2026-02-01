@@ -7,7 +7,7 @@ import {TextEffect} from "@/components/motion-primitives/text-effect";
 import {AnimatedGroup} from "@/components/motion-primitives/animated-group";
 import V0Icon from "@/components/icons/v0-icon";
 import VercelWordmarkIcon from "@/components/icons/vercel-wordmark-icon";
-import GlobantLogoIcon from "@/components/icons/globant-logo-icon";
+// import GlobantLogoIcon from "@/components/icons/globant-logo-icon";
 import DecryptedText from "@/components/DecryptedText";
 import {transitionVariants} from "@/lib/utils";
 import LanyardWithControls from "@/components/lanyard-with-controls";
@@ -22,7 +22,7 @@ export default function HeroSection() {
                         <div className="mx-auto max-w-2xl text-center lg:ml-0 lg:text-left">
                             <div className='mt-8 lg:mt-16'>
                                 <DecryptedText
-                                    text="Thursday February 5th, 2026 - New York City"
+                                    text="Thursday February 5th, 2026 - Peshawar"
                                     animateOn="view"
                                     revealDirection="start"
                                     sequential
@@ -129,8 +129,7 @@ export default function HeroSection() {
                                                         className='text-foreground mx-auto'/>
                                 </div>
                                 <div className="flex items-center">
-                                    <GlobantLogoIcon size={20} aria-label="Globant Logo"
-                                                     className='text-foreground mx-auto'/>
+                                    <span className="text-sm font-semibold">Supabase Peshawar</span>
                                 </div>
                             </InfiniteSlider>
                             <div

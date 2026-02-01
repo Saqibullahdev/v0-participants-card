@@ -186,7 +186,7 @@ export default function LanyardWithControls({
         userName={inputValue}
         variant={cardVariant}
         onTextureReady={handleTextureReady}
-        city='guadalajara'
+        city='Peshawar'
         date='05.02.2026'
       />
       <Lanyard
